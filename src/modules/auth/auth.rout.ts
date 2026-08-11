@@ -1,16 +1,18 @@
 import { Router } from "express";
-import { authController } from "./auth.controller";
-import { changePasswordValidator, createAccountValidator, forgotPasswordValidator, loginAccountValidator, refreshTokenValidator, resetPasswordValidator, social_loginAccountValidator } from "./auth.validator";
+import { changePasswordValidator, createAccountValidator, forgotPasswordValidator, loginAccountValidator, refreshTokenValidator, resetPasswordValidator } from "./auth.validator";
 import req_validator from "../../middleware/req_validation";
 import { otpResendValidator, otpVerifyValidator } from "../otp/otp.validation";
-import { otpControllers } from "../otp/otp.controller";
 import auth from "../../middleware/auth";
-import { Role } from "../../../generated/prisma/enums";
 import { document_Upload } from "../../utils/s3";
 import parseData from "../../middleware/parseData";
 import { rateLimit } from 'express-rate-limit';
+import { AuthController } from "./auth.controller";
+import { OtpController } from "../otp/otp.controller";
+import { Role } from "../user/user.interface";
 
 const router = Router();
+const authController = new AuthController();
+const otpController = new OtpController();
 
 export const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
@@ -44,26 +46,12 @@ router.post('/login',
     authController.loginUser
 )
 
-router.post('/social-login',
-    apiLimiter,
-    social_loginAccountValidator,
-    req_validator(),
-    authController.socialLogin
-)
-
-router.post('/admin/login',
-    apiLimiter,
-    loginAccountValidator,
-    req_validator(),
-    authController.adminLogin
-)
-
 router.patch(
     '/change-password',
     apiLimiter,
     changePasswordValidator,
     req_validator(),
-    auth(Role.ADMIN, Role.USER),
+    auth(Role.STAFF, Role.CUSTOMER),
     authController.changePassword,
 );
 
@@ -77,7 +65,7 @@ router.post(
     '/verify-otp',
     otpVerifyValidator,
     req_validator(),
-    otpControllers.verifyOtp,
+    otpController.verifyOtp,
 );
 
 router.post(
@@ -96,7 +84,7 @@ router.post(
     }),
     otpResendValidator,
     req_validator(),
-    otpControllers.resendOtp,
+    otpController.resendOtp,
 );
 
 router.post('/forgot-password',
@@ -118,4 +106,4 @@ router.patch('/reset-password',
     apiLimiter,
     resetPasswordValidator, req_validator(), authController.resetPassword);
 
-export const authRouts = router
+export const authRouts = router;

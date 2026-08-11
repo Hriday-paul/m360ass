@@ -4,8 +4,13 @@ export interface User {
     name: string;
     email: string;
     password: string;
-    role: "staff" | "customer";
+    role: Role;
     created_at?: Date;
     updated_at?: Date;
     isVerified: boolean;
+}
+
+export enum Role {
+    STAFF = 'staff',
+    CUSTOMER = 'customer'
 }

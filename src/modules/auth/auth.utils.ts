@@ -1,8 +1,8 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { Role } from '../../../generated/prisma/enums';
+import { Role } from '../user/user.interface';
 
 export const createToken = (
-  jwtPayload: { userId: string; role: Role },
+  jwtPayload: { userId: number; role: Role },
   secret: string,
   expiresIn: number,
 ) => {

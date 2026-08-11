@@ -11,7 +11,6 @@ import handelMulterError from '../error/MulterError';
 import handleValidationError from '../error/ValidationError';
 import { validationResult } from 'express-validator';
 import handleRateLimitError from './RateLimitError';
-import { Prisma } from '../../generated/prisma/client';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
@@ -72,21 +71,6 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  }
-  else if (err instanceof Prisma.PrismaClientKnownRequestError ||
-    err instanceof Prisma.PrismaClientValidationError ||
-    err instanceof Prisma.PrismaClientInitializationError ||
-    err instanceof Prisma.PrismaClientRustPanicError ||
-    err instanceof Prisma.PrismaClientUnknownRequestError) {
-    statusCode = err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025' ? 404
-      : err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002' ? 409
-        : err instanceof Prisma.PrismaClientInitializationError ? 503
-          : 400;
-
-    // ✅ Use meta.cause if available, fallback to generic message
-    const cause = (err as Prisma.PrismaClientKnownRequestError)?.meta?.cause as string;
-    message = cause ?? err.message;
-    errorSources = [{ path: '', message }];
   }
   else if (err instanceof Error) {
     message = err.message;

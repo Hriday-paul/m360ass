@@ -1,5 +1,6 @@
 
-export interface OtpInterface {
+
+export interface OtpRequest {
     id: number;
     code: string;
     expiredAt: Date;

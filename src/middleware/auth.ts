@@ -4,8 +4,8 @@ import { JwtPayload } from 'jsonwebtoken';
 import catchAsync from '../utils/catchAsync';
 import AppError from '../error/AppError';
 import config from '../config/index';
-import prisma from '../shared/prisma';
-import { Role } from '../../generated/prisma/enums';
+import { Role, User } from '../modules/user/user.interface';
+import db from '../db/knex';
 
 const auth = (...userRoles: Role[]) => {
     return catchAsync(async (req, res, next) => {
@@ -28,25 +28,17 @@ const auth = (...userRoles: Role[]) => {
             throw new AppError(httpStatus.UNAUTHORIZED, 'unauthorized');
         }
         const { role, userId } = decode;
-        const isUserExist = await prisma.user.findFirst({ where: { id: userId }, include: { auth: true } });
+        const isUserExist = await db<User>('users').where({ id: userId }).select("*").first();
 
         if (!isUserExist) {
             throw new AppError(httpStatus.NOT_FOUND, 'User not found');
         }
 
-        if (!isUserExist?.auth?.isverified) {
-            throw new AppError(httpStatus.UNAUTHORIZED, 'You are not verifiend');
+        if (!isUserExist?.isVerified) {
+            throw new AppError(httpStatus.UNAUTHORIZED, 'You are not verified');
         }
 
-        if (isUserExist?.auth?.isDeleted) {
-            throw new AppError(httpStatus.FORBIDDEN, 'Your account is deleted');
-        }
-
-        if (!isUserExist?.auth?.status) {
-            throw new AppError(httpStatus.FORBIDDEN, 'Your account is blocked');
-        }
-
-        if (userRoles && !userRoles.includes(isUserExist?.auth?.role)) {
+        if (userRoles && !userRoles.includes(isUserExist?.role)) {
             throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
         }
 
