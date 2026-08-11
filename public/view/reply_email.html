@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Reply</title>
+    <style>
+        /* Reset styles for email compatibility */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* Main styles */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        
+        .header {
+            background-color: #9B111E;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .ticket-info {
+            background-color: #f8fafc;
+            border-left: 4px solid #9B111E;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .ticket-info h3 {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .ticket-details {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        
+        .ticket-details strong {
+            color: #374151;
+        }
+        
+        .response-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #374151;
+            margin: 25px 0;
+        }
+        
+        .response-content p {
+            margin: 0 0 15px 0;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin: 35px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: #9B111E;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background-color: #9B111E;
+        }
+        
+        .additional-help {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        
+        .additional-help h4 {
+            margin: 0 0 10px 0;
+            color: #92400e;
+            font-size: 16px;
+        }
+        
+        .additional-help p {
+            margin: 0;
+            color: #92400e;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            background-color: #f9fafb;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        
+        .footer .company-info {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .social-links {
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .social-links a:hover {
+            color: #9B111E;
+        }
+        
+        /* Mobile responsiveness */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            
+            .header, .content, .footer {
+                padding: 20px !important;
+            }
+            
+            .header h1 {
+                font-size: 20px !important;
+            }
+            
+            .greeting {
+                font-size: 16px !important;
+            }
+            
+            .response-content {
+                font-size: 14px !important;
+            }
+            
+            .cta-button {
+                padding: 12px 24px !important;
+                font-size: 14px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Support Team Response</h1>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <div class="greeting">
+                Hello {{customer_name}},
+            </div>
+            
+            <!-- Response Content -->
+            <div class="response-content">
+                <p>Thank you for contacting our support team. We have reviewed your inquiry and are pleased to provide you with the following response:</p>
+                
+                <p>{{details}}</p>
+                
+                <p>We hope this resolves your issue. If you have any additional questions or need further assistance, please don't hesitate to reach out to us.</p>
+            </div>
+            
+            <!-- Additional Help Section -->
+            <div class="additional-help">
+                <h4>Need More Help?</h4>
+                <p>If this doesn't fully resolve your issue, you can send another support message from our app.</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="company-info">Milo22 Support Team</p>
+            
+            <p style="margin-top: 20px; font-size: 12px;">
+                Please do not reply to this email if your issue has been resolved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100%;
+        padding: 20px;
+        background-color: #ffffff;
+      }
+      .email-body {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border: 1px solid #e5e5e5;
+        padding: 30px;
+        border-radius: 8px;
+      }
+      .logo {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .logo img {
+        width: 120px;
+      }
+      .otp-message {
+        font-size: 18px;
+        color: #333333;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .otp-code {
+        display: inline-block;
+        font-size: 24px;
+        font-weight: bold;
+        color: #ffffff;
+        background-color: #42b4aa;
+        padding: 10px 20px;
+        border-radius: 5px;
+      }
+      .cta {
+        text-align: center;
+        margin-top: 30px;
+      }
+      .footer {
+        font-size: 12px;
+        color: #999999;
+        text-align: center;
+        margin-top: 30px;
+      }
+      .footer a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="email-body">
+        <div class="logo">
+          <img
+            src="https://server.milo22.cloud/logo.png"
+            alt="app Logo"
+          />
+        </div>
+        <div class="otp-message">
+          <p>Hello {{email}},</p>
+          <p>
+            We received a request to reset the password for your account. Your One-Time Password (OTP) to reset your password is:
+          </p>
+          <p class="otp-code">{{otp}}</p>
+          <p>
+            This code is valid for 10 minutes. Please do not share this code with anyone.
+          </p>
+        </div>
+        <div class="cta">
+          <p>If you didn't request a password reset, please ignore this email.</p>
+          <p>Thank you for using our app.</p>
+          <p>
+            <a href="https://play.google.com/store/apps/details?id=co.miloapp22.app" style="color: #2563eb">Give review on Play store</a>
+          </p>
+        </div>
+      </div>
+      <!-- <div class="footer">
+        <p>
+          If you need further assistance, please
+          <a href="mailto:support.Forager@gmail.com">contact support</a>.
+        </p>
+      </div> -->
+    </div>
+  </body>
+</html>
