@@ -21,6 +21,6 @@ router.put("/:id", rateLimiter(), auth(Role.STAFF), image_Upload.array('images')
 
 router.delete("/photo", rateLimiter(), deleteVehiclePhotoValidator, req_validator(), auth(Role.STAFF), vehicleController.deleteVehiclePhotoById);
 
-router.delete("/:id", auth(Role.STAFF), vehicleController.deleteVehicleById);
+router.delete("/:id",  rateLimiter(), auth(Role.STAFF), vehicleController.deleteVehicleById);
 
 export const vehicleRoutes = router;

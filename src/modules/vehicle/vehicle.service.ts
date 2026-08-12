@@ -72,14 +72,13 @@ export class VehicleService {
             db_total_query.where("category", category);
         }
         if (search) {
-            db_query.where(function () {
-                this.where("v.name", "ilike", `%${search}%`)
-                    .orWhere("v.plate_number", "ilike", `%${search}%`);
-            })
-            db_total_query.where(function () {
-                this.where("name", "ilike", `%${search}%`)
-                    .orWhere("plate_number", "ilike", `%${search}%`);
-            })
+            db_query
+                .whereILike("v.name", `%${search}%`)
+                .orWhereILike("v.plate_number", `%${search}%`);
+                
+            db_total_query
+                .whereILike("v.name", `%${search}%`)
+                .orWhereILike("v.plate_number", `%${search}%`);
         }
 
         const vehicles = await db_query
@@ -164,8 +163,6 @@ export class VehicleService {
                 'No valid field found',
             );
         }
-
-        console.log(new_images)
 
         const result = await db.transaction(async (trx) => {
             //update vehicle details
