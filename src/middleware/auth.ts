@@ -42,7 +42,7 @@ const auth = (...userRoles: Role[]) => {
             throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
         }
 
-        req.user = { id: userId, role };
+        req.user = { id: userId, role, email: isUserExist?.email };
 
         next();
     });

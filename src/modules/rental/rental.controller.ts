@@ -13,12 +13,12 @@ export class RentalController {
 
     bookRental = catchAsync(async (req: Request, res: Response) => {
 
-        const result = await rentalService.bookRental(req.body);
+        const result = await rentalService.bookRental(req.body, req.user);
 
         sendResponse(res, {
             statusCode: httpStatus.OK,
             success: true,
-            message: 'Rental booked successfully',
+            message: 'Rental booking on process, you will receive an email once the booking is confirmed',
             data: result,
         });
     })
@@ -64,13 +64,13 @@ export class RentalController {
 
     updateRentalById = catchAsync(async (req: Request, res: Response) => {
 
-        const result = await rentalService.updateRentalById(req.params.id, req.body);
+        const result = await rentalService.updateRentalById(req.params.id, req.body, req.user);
 
         sendResponse(res, {
             statusCode: httpStatus.OK,
             success: true,
-            message: 'Rental updated successfully',
-            data: result,
+            message: result?.message || 'Rental updated successfully',
+            // data: result,
         });
     })
 

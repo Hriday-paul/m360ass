@@ -5,10 +5,11 @@ import { Rental } from "./rental.interface";
 import httpstatus from "http-status";
 import { paginationHelper, TPaginationOptions } from "../../helper/pagination.helper";
 import { Vehicle } from "../vehicle/vehicle.interface";
+import { makeRentalQueue, updateRentalQueue } from "../../queues/rental.queue";
 
 export class RentalService {
 
-    async bookRental(payload: Rental) {
+    async bookRental(payload: Rental, currentUser: { id: number, email: string }) {
         const { created_at, updated_at, total_amount, ...morePayload } = payload;
 
         //check vehicle exists
@@ -18,27 +19,16 @@ export class RentalService {
             throw new AppError(httpstatus.NOT_FOUND, "Vehicle does not exist");
         }
 
-        //validate a rental is already booked for the same vehicle and overlapping dates
-        const overlappingRental = await db("rentals")
-            .where("vehicle_id", morePayload.vehicle_id)
-            .whereNot("status", "cancelled")
-            .where("start_date", "<=", morePayload.end_date)
-            .where("end_date", ">=", morePayload.start_date)
-            .first();
-
-        if (overlappingRental) {
-            throw new AppError(
-                httpstatus.CONFLICT,
-                "Vehicle is already booked for the selected dates"
-            );
-        }
-
         const totalDay = moment(morePayload.end_date).diff(moment(morePayload.start_date), "days") + 1;
         const totalAmount = totalDay * vehicle.daily_rate;
 
-        // Insert rental into the database
-        const [rental] = await db("rentals").insert({ ...morePayload, total_amount: totalAmount }).returning("*");
-        return rental;
+        // Add job to the rental queue for dublicate process at the same time
+        await makeRentalQueue.add(
+            "makeNewRental",
+            { ...morePayload, total_amount: totalAmount, daily_rate: vehicle.daily_rate, requested_staff_email: currentUser.email }
+        )
+
+        return;
     }
 
     async rentals(query: Record<string, unknown>, options: TPaginationOptions) {
@@ -135,7 +125,8 @@ export class RentalService {
 
     async updateRentalById(
         rentalId: string,
-        payload: Partial<Rental>
+        payload: Partial<Rental>,
+        currentUser: { id: number, email: string }
     ) {
         const {
             vehicle_id,
@@ -180,28 +171,6 @@ export class RentalService {
             }
         }
 
-        // Check overlap if vehicle/date is changed
-        if (
-            vehicle_id !== undefined ||
-            start_date !== undefined ||
-            end_date !== undefined
-        ) {
-            const overlappingRental = await db("rentals")
-                .where("vehicle_id", targetVehicleId)
-                .whereNot("id", rentalId)
-                .whereNotIn("status", ["cancelled"])
-                .where("start_date", "<=", targetEndDate)
-                .where("end_date", ">=", targetStartDate)
-                .first();
-
-            if (overlappingRental) {
-                throw new AppError(
-                    httpstatus.CONFLICT,
-                    "Vehicle is already booked for the selected dates"
-                );
-            }
-        }
-
         // Build update fields
         const updateFields: Partial<Rental> = {
             vehicle_id,
@@ -212,31 +181,20 @@ export class RentalService {
             status,
         };
 
-        // Recalculate total amount if vehicle/date changes
+        
         if (
             vehicle_id !== undefined ||
             start_date !== undefined ||
             end_date !== undefined
         ) {
-            const vehicle = await db<Vehicle>("vehicles")
-                .where("id", targetVehicleId)
-                .where("isDeleted", false)
-                .first();
 
-            if (!vehicle) {
-                throw new AppError(
-                    httpstatus.NOT_FOUND,
-                    "Vehicle does not exist"
-                );
-            }
+            // Add job to the rental queue for dublicate process at the same time & recalculate total_amount if vehicle/date changes
+            await updateRentalQueue.add(
+                "updateRental",
+                { payload: updateFields, targetStartDate, targetEndDate, targetVehicleId, rentalId, requested_staff_email: currentUser.email }
+            )   
 
-            const start = moment(targetStartDate);
-            const end = moment(targetEndDate);
-
-            const totalDay = end.diff(start, "days") + 1;
-
-            updateFields.total_amount =
-                totalDay * Number(vehicle.daily_rate);
+            return {message : "Rental update in progress, you will receive an email once the update is complete"};
         }
 
         // Remove undefined/null fields
@@ -260,8 +218,7 @@ export class RentalService {
             .where("id", rentalId)
             .update(updateFields);
 
-
-        return;
+            return {message : "Rental updated successfully"};
     }
 
     async deleteRentalById(rentalId: string) {

@@ -11,6 +11,8 @@ A REST API for a vehicle rental company. Staff authenticate and manage the vehic
 - **File Uploads:** Multer (local photo storage)
 - **Auth:** JWT
 - **Validation:** Express validator
+- **Rate Limit:** Express Rate Limiter
+- **Queue:** Bullmq
 - **Linting/Formatting:** ESLint + Prettier
 
 ## Project Structure
@@ -87,7 +89,7 @@ A REST API for a vehicle rental company. Staff authenticate and manage the vehic
 3. **Create the database**
 
    ```bash
-   CREATE DATABASE database_name
+   CREATE DATABASE assesment_m3
    ```
 
 4. **Apply migrations**
@@ -107,12 +109,37 @@ A REST API for a vehicle rental company. Staff authenticate and manage the vehic
 6. **Start the server**
 
    ```bash
-   # development (with reload)
    npm run dev
 
    # production build
    npm run build
    npm start
    ```
+   
+   The API will be available at `http://localhost:5100`
 
-   The API will be available at `http://localhost:5100`.
+7. **Create a new staff**
+
+   ```bash
+   /auth/create # using this rout signup a new account by provide valid request body 
+
+   /auth/verify-otp # then verify the account, using this rout
+   
+   /auth/login #thenk, login to the account, using this rout
+   
+   # now can proceed to check all other api routs
+   ```
+
+   ## 🔒 Concurrency Handling & Queue-Based Booking Flow
+ 
+> Rental creation and updates are race-condition-safe. Booking checks are funneled through a **BullMQ** queue (backed by Redis, workers under `src/workers/`) instead of relying on a DB transaction alone — so two staff members booking the same vehicle for overlapping dates at the same instant cannot both succeed.
+ 
+**1. Rental booking queue (race-condition protection)**
+ 
+- **New rental (`POST /rentals`):** every booking request is pushed onto the queue instead of being processed inline. The worker picks up jobs one at a time per vehicle, re-runs the overlap check (same vehicle + overlapping date range) against the current DB state, and only then creates the rental. This serializes writes for the same vehicle so two customers can't both win a booking for the same car/date range — the request that loses the race fails the overlap check once its job is processed, instead of slipping through a check-then-insert gap in a parallel request.
+- **Update rental (`PUT /rentals/:id`):** only routed through the same queued overlap check when the update actually changes something that affects availability — `vehicle_id`, `start_date`, or `end_date`. Updates that only touch other fields (e.g. `customer_name`, `status` housekeeping) skip the queue and are applied directly, since they can't create a scheduling conflict.
+**2. Email notification queue**
+ 
+- **On successful booking or update:** an email job is queued (`queues/email.queue.ts`) to notify the requesting staff member that the rental was created/updated successfully.
+- **On failed booking:** if a queued rental job is rejected (e.g. it lost the race to an overlapping booking), a separate email job is queued to notify the requesting staff member that the rental attempt failed, along with the reason.
+Sending mail through the queue — rather than inline in the request handler — keeps the HTTP response fast and decouples notification delivery from the booking flow, so a slow or failing mail provider can't block or fail a booking request.
