@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { authRouts } from './modules/auth/auth.rout';
 import { userRoutes } from './modules/user/user.rout';
+import { vehicleRoutes } from './modules/vehicle/vehicle.rout';
 
 const router = express.Router();
 
@@ -12,6 +13,10 @@ const moduleRoutes = [
     {
         path: '/users',
         route: userRoutes,
+    },
+    {
+        path: '/vehicles',
+        route: vehicleRoutes,
     },
 ];
 

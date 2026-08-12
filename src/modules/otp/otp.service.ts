@@ -41,7 +41,7 @@ export class OtpService {
       );
     }
 
-    const user = await db<User>('users').where({ id: decode?.userId }).select("*").first();
+    const user = await db<User>('users').where({ id: decode?.userId }).select("id", "isVerified", "email", "name", "role").first();
 
     const otpRequest = await db<OtpRequest>('otp_requests').where({ id: decode?.requestId }).first();
 

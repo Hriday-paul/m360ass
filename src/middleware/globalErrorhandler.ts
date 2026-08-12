@@ -10,7 +10,7 @@ import { MulterError } from 'multer';
 import handelMulterError from '../error/MulterError';
 import handleValidationError from '../error/ValidationError';
 import { validationResult } from 'express-validator';
-import handleRateLimitError from './RateLimitError';
+import handleRateLimitError from '../error/RateLimitError';
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
 

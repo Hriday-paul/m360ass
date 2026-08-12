@@ -1,8 +1,8 @@
 import { Router } from "express";
 import auth from "../../middleware/auth";
-import { apiLimiter } from "../auth/auth.rout";
 import { UserController } from "./user.controller";
 import { Role } from "./user.interface";
+import { rateLimiter } from "../../middleware/RateLimiter";
 
 const router = Router();
 
@@ -10,7 +10,7 @@ const userController = new UserController();
 
 router.patch(
     '/update-my-profile',
-    apiLimiter,
+    rateLimiter(),
     auth(Role.STAFF, Role.CUSTOMER),
     userController.updateProfile,
 );
@@ -29,14 +29,14 @@ router.get(
 
 router.delete(
     '/delete-account',
-    apiLimiter,
+    rateLimiter(),
     auth(Role.STAFF, Role.CUSTOMER),
     userController.deletemyAccount,
 );
 
 // router.delete(
 //     '/delete-account/:id',
-//     apiLimiter,
+//     rateLimiter(),
 //     auth(Role.ADMIN),
 //     userController.deleteUser,
 // );

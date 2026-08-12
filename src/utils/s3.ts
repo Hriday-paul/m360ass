@@ -8,39 +8,6 @@ import AppError from '../error/AppError';
 import config from '../config';
 import { s3Client } from '../constants/aws';
 
-import multer, { memoryStorage } from "multer";
-
-const storage = memoryStorage();
-
-export const image_Upload = multer({
-  storage,
-  limits: { fileSize: 1024 * 1024 * 10 /* 10 mb */ },
-  fileFilter(req, file, cb) {
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
-  },
-});
-
-export const document_Upload = multer({
-  storage,
-  limits: { fileSize: 1024 * 1024 * 10 }, // 10 MB
-  fileFilter(req, file, cb) {
-
-    const allowedTypes = [
-      'image/png',
-      'image/jpeg',
-      'image/jpg',
-      'image/webp',
-      'application/pdf',
-    ];
-
-    cb(null, true);
-  },
-});
 
 //upload a single file
 export const uploadToS3 = async (
